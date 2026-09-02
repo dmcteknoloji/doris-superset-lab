@@ -235,6 +235,48 @@ onları da silmek isterseniz komut ekranda yazıyor.
 | `sqlserver-katalog.sh` | Doris'ten SQL Server'a JDBC kataloğu ve federe sorgular |
 | `temizle.sh` | Her şeyi kaldırır |
 
+## Bu laboratuvarı kim hazırladı
+
+Çağlar Özenç, DMC Bilgi Teknolojileri. On beş yılı aşkın süredir SQL Server ve
+veritabanı tarafında çalışıyorum, altı kez Microsoft Data Platform MVP seçildim.
+
+Bu laboratuvar gerçek bir soruyla başladı. Bir kurum Microsoft ürünlerinden çıkmak
+istediğini yazdı ve Power BI alternatifi sordu. Cevabı ararken fark ettim ki
+piyasada dolaşan sayıların çoğu satıcı bloglarından geliyor, kimse kendi
+donanımında ölçmüyor. Bu depo o boşluğu kapatmak için var.
+
+### Power BI çıkışı konuşuyorsanız
+
+Power BI yalnız durmaz. Altında SSAS, SSIS, SQL Server ve genelde SSRS vardır.
+Rapor yüzünü değiştirmek kolay kısımdır, altındaki katman projenin gerçek yükünü
+taşır. DAX ölçüleri taşınmaz, baştan yazılır. SSRS'in sayfalı raporlarının birebir
+açık kaynak karşılığı yoktur.
+
+Bu yüzden işe kapsam çıkararak başlıyoruz. Altı soru:
+
+1. Kaç Power BI raporu var?
+2. Kaç SSRS raporu var?
+3. Kaç SSIS paketi var?
+4. Kaç DAX ölçüsü ve hangi karmaşıklıkta?
+5. Kaç aktif kullanıcı?
+6. Hangi veri kaynakları besliyor?
+
+Bu altı sayı elde olmadan verilen takvim tahmindir. Yarıda kalan göç projelerinin
+çoğu buradan kalıyor.
+
+### DMC'de yaptığımız işler
+
+SQL Server sağlık ve güvenlik değerlendirmesi, SQL Server'dan PostgreSQL'e geçiş,
+veri ambarının yeniden kurgulanması, raporlama katmanının taşınması ve devamında
+yönetilen DBA hizmeti. Değerlendirme aşaması kısa ve somut, çıktısı bulgu listesi
+ve takvim oluyor.
+
+Konuşmak isterseniz:
+
+- **iletisim@dmcteknoloji.com**
+- **dmcteknoloji.com**
+- **caglarozenc.com** (teknik yazılar)
+
 ## Lisans
 
 MIT. Ölçümlerinizi paylaşırsanız memnun olurum, özellikle x86 sunucuda üç motorun
