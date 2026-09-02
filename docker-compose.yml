@@ -1,0 +1,123 @@
+services:
+  doris-fe:
+    image: apache/doris:fe-4.0.8
+    container_name: lab-doris-fe
+    hostname: doris-fe
+    environment:
+      - FE_SERVERS=fe1:172.28.10.2:9010
+      - FE_ID=1
+      - JAVA_OPTS_FOR_JDK_17=-Xmx1024m -XX:+UseG1GC -Dfile.encoding=UTF-8
+    ports:
+      - "9030:9030"   # MySQL protokolu
+      - "8030:8030"   # HTTP / Stream Load
+    volumes:
+      - femeta:/opt/apache-doris/fe/doris-meta
+      - ./data/fe-log:/opt/apache-doris/fe/log
+    networks:
+      lab:
+        ipv4_address: 172.28.10.2
+    mem_limit: 2500m
+
+  doris-be:
+    image: apache/doris:be-4.0.8
+    container_name: lab-doris-be
+    hostname: doris-be
+    depends_on: [doris-fe]
+    environment:
+      - FE_SERVERS=fe1:172.28.10.2:9010
+      - BE_ADDR=172.28.10.3:9050
+    ports:
+      - "8040:8040"
+    volumes:
+      - bestorage:/opt/apache-doris/be/storage
+      - ./data/be-log:/opt/apache-doris/be/log
+      - ./conf/be_custom.conf:/opt/apache-doris/be/conf/be_custom.conf
+    networks:
+      lab:
+        ipv4_address: 172.28.10.3
+    mem_limit: 3g
+
+  postgres:
+    image: postgres:16
+    container_name: lab-postgres
+    shm_size: 1gb
+    environment:
+      - POSTGRES_PASSWORD=labpass
+      - POSTGRES_USER=lab
+      - POSTGRES_DB=superset
+    ports:
+      - "55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    command: >
+      postgres -c shared_buffers=512MB -c work_mem=64MB
+               -c max_parallel_workers_per_gather=4
+               -c effective_cache_size=1536MB
+    networks:
+      lab:
+        ipv4_address: 172.28.10.4
+    mem_limit: 3g
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    platform: linux/amd64
+    container_name: lab-mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:-Lab_Parola_2026!}
+      - MSSQL_PID=Developer
+      - MSSQL_MEMORY_LIMIT_MB=2560
+    ports:
+      - "11433:1433"
+    volumes:
+      - mssqldata:/var/opt/mssql
+      - ./csv:/csv:ro
+    networks:
+      lab:
+        ipv4_address: 172.28.10.7
+    mem_limit: 3g
+
+  redis:
+    image: redis:7-alpine
+    container_name: lab-redis
+    networks:
+      lab:
+        ipv4_address: 172.28.10.5
+    mem_limit: 200m
+
+  superset:
+    image: lab-superset:6.1.0-doris
+    container_name: lab-superset
+    depends_on: [postgres, redis]
+    environment:
+      - SUPERSET_SECRET_KEY=lab-only-not-a-real-secret-key-2026
+      - DATABASE_DIALECT=postgresql
+      - DATABASE_HOST=172.28.10.4
+      - DATABASE_PORT=5432
+      - DATABASE_DB=superset
+      - DATABASE_USER=lab
+      - DATABASE_PASSWORD=labpass
+      - REDIS_HOST=172.28.10.5
+      - REDIS_PORT=6379
+      - SUPERSET_LOAD_EXAMPLES=no
+    ports:
+      - "8088:8088"
+    volumes:
+      - ./conf/superset_config.py:/app/pythonpath/superset_config.py
+    networks:
+      lab:
+        ipv4_address: 172.28.10.6
+    mem_limit: 1500m
+
+volumes:
+  pgdata:
+  mssqldata:
+  femeta:
+  bestorage:
+
+networks:
+  lab:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.10.0/24
